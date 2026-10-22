@@ -62,10 +62,10 @@ enum AircraftKind: String, CaseIterable {
     var rotates: Bool { self != .balloon && self != .drone }
 }
 
-// MARK: - Uso: comercial, privado o militar
+// MARK: - Uso: comercial, privado, militar o policial
 
 enum FlightUse: String, CaseIterable, Identifiable {
-    case commercial, general, military
+    case commercial, general, military, police
 
     var id: String { rawValue }
     var label: String {
@@ -73,6 +73,7 @@ enum FlightUse: String, CaseIterable, Identifiable {
         case .commercial: "Comercial"
         case .general: "Privada"
         case .military: "Militar"
+        case .police: "Policía"
         }
     }
     var singular: String {
@@ -80,6 +81,7 @@ enum FlightUse: String, CaseIterable, Identifiable {
         case .commercial: "comercial"
         case .general: "privado"
         case .military: "militar"
+        case .police: "policial"
         }
     }
     var plural: String {
@@ -87,6 +89,7 @@ enum FlightUse: String, CaseIterable, Identifiable {
         case .commercial: "comerciales"
         case .general: "privados"
         case .military: "militares"
+        case .police: "policiales"
         }
     }
     var color: Color {
@@ -94,6 +97,7 @@ enum FlightUse: String, CaseIterable, Identifiable {
         case .commercial: Color(hex: 0x2563eb)
         case .general: Color(hex: 0xea580c)
         case .military: Color(hex: 0x475569)
+        case .police: Color(hex: 0x0f766e)
         }
     }
 }
@@ -149,8 +153,23 @@ enum Classifier {
         kind(type: a.type ?? info?.icaoType, category: a.category)
     }
 
+    /// Propietarios policiales según adsbdb (p. ej. «National Police Air Service», «Guardia Civil», «Polizei»).
+    private static let policeOwner = #"(?i)polic|polizei|politie|policja|gendarm|guardia civil|carabinieri|ertzaintza|mossos|sheriff|highway patrol|state patrol|garda"#
+    /// Indicativos policiales conocidos: POLICE y UKP (Reino Unido), POF (Police aux frontières, Francia),
+    /// BPO (Bundespolizei), PPH/PMV (Polizei de Baja Sajonia / Mecklemburgo), ZEUS (Policía Nacional)
+    /// y CUCO (Guardia Civil). Los dos españoles son indicativos de radio habituales, no códigos OACI oficiales.
+    private static let policeCallsign = #"^(POLICE|UKP|NPAS|POF|BPO|PPH|PMV|ZEUS|CUCO)"#
+
+    static func isPolice(_ a: Aircraft, info: AircraftInfo?) -> Bool {
+        if a.callsign.range(of: policeCallsign, options: .regularExpression) != nil { return true }
+        if let owner = info?.registeredOwner, owner.range(of: policeOwner, options: .regularExpression) != nil { return true }
+        return false
+    }
+
     /// `hasAirline`: adsbdb devolvió una aerolínea para este indicativo.
     static func use(_ a: Aircraft, info: AircraftInfo? = nil, hasAirline: Bool = false) -> FlightUse {
+        // Antes que militar: cuerpos como la Guardia Civil o la Gendarmerie aparecen marcados como militares en ADS-B.
+        if isPolice(a, info: info) { return .police }
         if a.isMilitary { return .military }
         let k = kind(a, info: info)
         if k == .fighter { return .military }

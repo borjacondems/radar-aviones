@@ -97,7 +97,8 @@ final class RadarModel: ObservableObject {
                     let c = CLLocationCoordinate2D(latitude: lat, longitude: lon)
                     return Contact(aircraft: a, coordinate: c, km: Geo.distanceKm(me, c))
                 }
-                .filter { useFilter == nil || Classifier.use($0.aircraft) == useFilter }
+                // Si ya consultamos sus datos en adsbdb, el propietario ayuda a detectar aviones policiales.
+                .filter { useFilter == nil || Classifier.use($0.aircraft, info: infoCache[$0.id] ?? nil) == useFilter }
                 .sorted { $0.km < $1.km }
 
             for c in contacts {

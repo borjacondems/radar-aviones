@@ -21,7 +21,7 @@ Requiere **macOS 14 Sonoma o posterior**. Funciona en Mac con Apple Silicon e In
 - **El avión más cercano** en vuelo (busca en unos 74 km), actualizado cada 5 segundos.
 - **En el mapa:** el avión con un icono según su tipo, la línea hasta ti, la estela de su recorrido y la ruta entre aeropuertos.
 - **Ficha:** número de vuelo y aerolínea, origen → destino, distancia y dirección con el ángulo sobre el horizonte, altitud, velocidad, rumbo, velocidad vertical, modelo, matrícula y foto.
-- **Tipo de vuelo:** comercial, privado o militar, con un filtro en la barra de herramientas.
+- **Tipo de vuelo:** comercial, privado, militar o policial, con un filtro en la barra de herramientas. Los aviones policiales se reconocen por su indicativo (POLICE, UKP, ZEUS, CUCO…) o por su propietario (Police, Policía, Polizei, Guardia Civil, Gendarmerie…).
 - **Iconos por tipo de nave:** cuatrimotor, fuselaje ancho, pasillo único, reactor regional o ejecutivo, turbohélice, avioneta, helicóptero, planeador, militar, globo y dron.
 
 Controles: arrastra el mapa para explorar (deja de seguir al avión; «Volver a seguir» lo recupera), **⌥-clic** para fijar otro punto de observación y «Ver el resto» para mostrar los demás aviones.
