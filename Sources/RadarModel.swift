@@ -61,6 +61,7 @@ final class RadarModel: ObservableObject {
 
     init() {
         useFilter = UserDefaults.standard.string(forKey: "useFilter").flatMap(FlightUse.init(rawValue:))
+            .flatMap { FlightUse.filterable.contains($0) ? $0 : nil }
     }
 
     func setPoint(_ c: CLLocationCoordinate2D) {

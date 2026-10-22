@@ -67,6 +67,9 @@ enum AircraftKind: String, CaseIterable {
 enum FlightUse: String, CaseIterable, Identifiable {
     case commercial, general, military, police
 
+    /// Opciones del filtro de la barra de herramientas. «Policía» solo se muestra como etiqueta.
+    static let filterable: [FlightUse] = [.commercial, .general, .military]
+
     var id: String { rawValue }
     var label: String {
         switch self {

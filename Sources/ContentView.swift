@@ -22,7 +22,7 @@ struct ContentView: View {
             ToolbarItemGroup {
                 Picker("Tipo", selection: $model.useFilter) {
                     Text("Todos").tag(FlightUse?.none)
-                    ForEach(FlightUse.allCases) { Text($0.label).tag(Optional($0)) }
+                    ForEach(FlightUse.filterable) { Text($0.label).tag(Optional($0)) }
                 }
                 .pickerStyle(.segmented)
                 .help("Mostrar el más cercano de este tipo")
