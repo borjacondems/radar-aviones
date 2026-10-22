@@ -40,7 +40,7 @@ Solo hacen falta las Command Line Tools de Xcode (`xcode-select --install`):
 
 - Posiciones: [adsb.lol](https://adsb.lol) y [adsb.fi](https://adsb.fi) (si una falla, se usa la otra).
 - Rutas y datos de la aeronave: [adsbdb](https://www.adsbdb.com).
-- Fotos: [planespotters.net](https://www.planespotters.net).
+- Fotos: [planespotters.net](https://www.planespotters.net). Si no hay foto de ese avión, se muestra una imagen de referencia del modelo sacada de [Wikipedia](https://en.wikipedia.org), indicada como tal.
 
 Los datos los aportan redes de voluntarios: puede haber huecos de cobertura o información incompleta.
 

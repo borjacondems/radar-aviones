@@ -249,11 +249,24 @@ private struct PhotoView: View {
                         placeholder(loading: true)
                     }
                 }
-                if let by = p.photographer, let link = p.link {
+                if let article = p.modelArticle {
+                    Text(referenceCaption(article: article, link: p.link))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                } else if let by = p.photographer, let link = p.link {
                     Link("© \(by) / planespotters.net", destination: link).font(.caption2)
                 }
             }
         }
+    }
+
+    /// «Imagen de referencia del modelo, no de este avión · Wikipedia: Eurocopter EC135», con el artículo enlazado.
+    private func referenceCaption(article: String, link: URL?) -> AttributedString {
+        var text = AttributedString("Imagen de referencia del modelo, no de este avión · ")
+        var source = AttributedString("Wikipedia: \(article)")
+        source.link = link
+        text.append(source)
+        return text
     }
 
     private func placeholder(loading: Bool) -> some View {

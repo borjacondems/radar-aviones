@@ -84,6 +84,41 @@ enum ADSBClient {
         let photos: [Item]
     }
 
+    private struct WikiResponse: Decodable {
+        struct Query: Decodable { let pages: [String: Page] }
+        struct Page: Decodable {
+            struct Thumb: Decodable { let source: String }
+            let title: String
+            let thumbnail: Thumb?
+            let fullurl: String?
+        }
+        let query: Query?
+    }
+
+    /// Texto de búsqueda del modelo: «Airbus A330 202» → «Airbus A330» (sin el código de variante).
+    static func modelQuery(info: AircraftInfo?, desc: String?) -> String? {
+        let raw = info.map { "\($0.manufacturer ?? "") \($0.type ?? "")" } ?? desc ?? ""
+        let words = raw.split(separator: " ").filter { $0.range(of: #"^\d{3}[A-Z0-9]*$"#, options: .regularExpression) == nil }
+        let q = words.joined(separator: " ").trimmingCharacters(in: .whitespaces)
+        return q.isEmpty ? nil : q
+    }
+
+    /// Foto de referencia del modelo: imagen principal del artículo de Wikipedia que mejor coincide.
+    static func modelPhoto(query: String) async -> Photo? {
+        var c = URLComponents(string: "https://en.wikipedia.org/w/api.php")!
+        c.queryItems = [
+            .init(name: "action", value: "query"), .init(name: "format", value: "json"),
+            .init(name: "generator", value: "search"), .init(name: "gsrsearch", value: "\(query) aircraft"),
+            .init(name: "gsrlimit", value: "1"), .init(name: "prop", value: "pageimages|info"),
+            .init(name: "piprop", value: "thumbnail"), .init(name: "pithumbsize", value: "800"),
+            .init(name: "inprop", value: "url"),
+        ]
+        let ua = ["User-Agent": "RadarAviones/1.1 (+https://github.com/borjacondems/radar-aviones)"]
+        guard let page = try? await get(c.url!, as: WikiResponse.self, headers: ua).query?.pages.values.first,
+              let src = page.thumbnail?.source, let url = URL(string: src) else { return nil }
+        return Photo(url: url, photographer: nil, link: page.fullurl.flatMap(URL.init(string:)), modelArticle: page.title)
+    }
+
     static func photo(hex: String, info: AircraftInfo?) async -> Photo? {
         if let contact = planespottersContact {
             let url = URL(string: "https://api.planespotters.net/pub/photos/hex/\(hex)")!

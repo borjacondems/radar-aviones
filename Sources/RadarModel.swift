@@ -58,6 +58,7 @@ final class RadarModel: ObservableObject {
     private var routeCache: [String: FlightRoute?] = [:]
     private var infoCache: [String: AircraftInfo?] = [:]
     private var photoCache: [String: Photo?] = [:]
+    private var modelPhotoCache: [String: Photo?] = [:]
 
     init() {
         useFilter = UserDefaults.standard.string(forKey: "useFilter").flatMap(FlightUse.init(rawValue:))
@@ -139,9 +140,20 @@ final class RadarModel: ObservableObject {
         guard closest?.id == a.hex else { return } // cambió el más cercano mientras cargaba
         route = .loaded(routeResult)
         info = .loaded(infoResult)
-        let p = await cachedPhoto(a.hex, info: infoResult)
+        var p = await cachedPhoto(a.hex, info: infoResult)
+        // Sin foto de este avión: una de referencia del modelo.
+        if p == nil, let query = ADSBClient.modelQuery(info: infoResult, desc: a.desc) {
+            p = await cachedModelPhoto(query)
+        }
         guard closest?.id == a.hex else { return }
         photo = .loaded(p)
+    }
+
+    private func cachedModelPhoto(_ query: String) async -> Photo? {
+        if let hit = modelPhotoCache[query] { return hit }
+        let r = await ADSBClient.modelPhoto(query: query)
+        modelPhotoCache[query] = r
+        return r
     }
 
     private func cachedRoute(_ cs: String) async -> FlightRoute? {

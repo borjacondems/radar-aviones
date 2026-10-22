@@ -112,6 +112,8 @@ struct Photo {
     let url: URL
     let photographer: String?
     let link: URL?
+    /// Foto genérica del modelo (Wikipedia), no de este avión concreto.
+    var modelArticle: String? = nil
 }
 
 /// Estado de una consulta secundaria (ruta, datos, foto) del avión mostrado.
