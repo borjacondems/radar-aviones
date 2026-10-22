@@ -80,12 +80,16 @@ private struct Card: View {
                 Text(route.value?.callsignIata ?? (a.callsign.isEmpty ? a.hex.uppercased() : a.callsign))
                     .font(.system(size: 34, weight: .bold))
                     .monospacedDigit()
-                Spacer()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                    .layoutPriority(1)
+                Spacer(minLength: 8)
                 VStack(alignment: .trailing) {
                     if let airline = route.value?.airline?.name { Text(airline) }
                     if route.value?.callsignIata != nil { Text(a.callsign).foregroundStyle(.secondary) }
                 }
                 .font(.callout)
+                .multilineTextAlignment(.trailing)
             }
         }
     }
@@ -117,7 +121,9 @@ private struct Card: View {
         VStack(alignment: alignment, spacing: 0) {
             Text(apt.code).font(.system(size: 28, weight: .bold))
             Text(apt.municipality ?? "").font(.caption).foregroundStyle(.secondary)
+                .multilineTextAlignment(alignment == .leading ? .leading : .trailing)
         }
+        .frame(maxWidth: 130, alignment: alignment == .leading ? .leading : .trailing)
     }
 
     private var stats: some View {
@@ -238,9 +244,12 @@ private struct PhotoView: View {
                 AsyncImage(url: p.url) { phase in
                     switch phase {
                     case .success(let image):
-                        image.resizable().aspectRatio(contentMode: .fill)
+                        // El hueco fija el tamaño y la foto lo rellena por encima: una foto con
+                        // .fill dentro del flujo de la vista ensancharía todo el panel.
+                        Color.clear
                             .frame(maxWidth: .infinity)
                             .frame(height: 214)
+                            .overlay { image.resizable().scaledToFill() }
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                             .accessibilityLabel("Foto de \(alt)")
                     case .failure:
